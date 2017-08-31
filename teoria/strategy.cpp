@@ -17,7 +17,7 @@
 using namespace std;
 using namespace NTL;
 
-static string alfa = "0123456789,abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ-.";
+static string alfa = "0123456789,abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ-.()";
 
 class strategy{
 public:
@@ -87,24 +87,21 @@ public:
 		dpq.push_back(modulo(c_pr, q-1));
 	}
 
-	ZZ resto_chino_rsa(ZZ);
 	void inf(){
 		cout << endl << "c_pu:  " << this->c_pu << endl;
 		cout << "N:  " << this->N << endl;
-		cout << "size:  " << ZZ(zz_to_str(this->N).size()) << endl;
-		//printf("time:  %.28f\n", alice->time/1000);
 	}	
 	void enc(){
 		ZZ c_pu, N;
 		cout << endl << "clave publica: "; cin >> c_pu;
 		cout << "N: "; cin >> N;
-		FILE *t_pl = fopen("sws/t_pl.txt", "r");
+		FILE *t_pl = fopen("sws/t_pl.dat", "r");
 		cifrar(t_pl,c_pu,N);
 		fclose(t_pl);
 	}
 	void dec(){
-		FILE *t_c = fopen("sws/t_ci.txt", "r");
-		decifrar(t_c);
+		FILE *t_c = fopen("sws/t_ci.dat", "r");
+		descifrar(t_c);
 		fclose(t_c);
 	}
 
@@ -117,7 +114,7 @@ public:
 		string sms = "", temp, aux, str;
 		bool tr = true;
 
-		t_c = fopen("sws/t_ci.txt", "w");
+		t_c = fopen("sws/t_ci.dat", "w");
 		while(tr){
 			c=getc(t_pl);
 			if(c!=EOF){
@@ -144,7 +141,7 @@ public:
 		fclose(t_c);
 	}
 
-	void decifrar(FILE *t_c){
+	void descifrar(FILE *t_c){
 		ZZ bq1 = ZZ((zz_to_str(ZZ(alfa.size()))).size());
 		ZZ bq3 = ZZ(zz_to_str(this->N).size());
 		ZZ temp = ZZ(0);
@@ -163,7 +160,7 @@ public:
 			}
 		}
 
-		t_dc = fopen("sws/t_dc.txt", "w");
+		t_dc = fopen("sws/t_dc.dat", "w");
 		string ind = "";
 		for(unsigned i=0; sms[i]!='\0'; i++){
 			ind += sms[i];
@@ -176,7 +173,7 @@ public:
 		fclose(t_dc);
 	}
 
-	ZZ rsa::resto_chino_rsa(ZZ w){
+	ZZ resto_chino_rsa(ZZ w){
 		ZZ x = ZZ(0), a, ad;
 		for(long int j=0;j<_p.size();j++){
 			ad = modulo(w, _p[j]); //saca modulo de t_cifr con p o q respe
@@ -192,10 +189,108 @@ public:
 
 class gammal_ : public strategy{
 public:
-	gammal_(){	};
-	void inf(){	};
-	void enc(){	};
-	void dec(){	};
+	int mb, na;
+	FILE *t_c, *t_dc;
+	ZZ e, p, g, d, r;
+	string abc;
+	gammal_(int t){
+		this->p = RandomPrime_ZZ(t);
+		this->g = generador(this->p);
+		this->d = modulo(RandomPrime_ZZ(t), p-4)+2;
+		this->e = exp_mod(this->g, this->d, this->p);
+
+		this->mb = zz_to_str(this->p).size();
+		this->na = alfa.size();
+	}
+	void inf(){
+		cout << endl << "p:  " << this->p << endl;
+		cout << "g:  " << this->g << endl;
+		cout << "e:  " << this->e << endl;
+	}
+	void enc(){
+		ZZ pb,gb,eb;
+		cout << endl << "pb: "; cin >> pb;
+		cout << "gb: "; cin >> gb;
+		cout << "eb: "; cin >> eb;
+		FILE *t_pl = fopen("sws/t_pl.dat", "r");
+		cifrar(t_pl,pb, gb, eb);
+		fclose(t_pl);
+	}
+	void dec(){
+		FILE *t_c = fopen("sws/t_ci.dat", "r");
+		ZZ b;
+		cout << endl << "cb: ";	cin >> b;
+		descifrar(t_c,b);
+		fclose(t_c);
+	}
+	
+	void cifrar(FILE *t_pl, ZZ pb, ZZ gb, ZZ eb){
+		int bl = zz_to_str(pb).size(), po;
+		ZZ ra = modulo(RandomPrime_ZZ(bl), pb-4)+2;
+		ZZ c1 = exp_mod(gb, ra, pb);
+		cout << endl << "c1:   " << c1 << endl;
+		ZZ k = exp_mod(eb, ra, pb);
+		
+		char c;
+		string asd="", sms="", aux;
+		ZZ temp;
+
+		while((c=getc(t_pl))!=EOF){
+			po = alfa.find(c);
+			aux = to_string(po);
+			sms += con_zero(aux,ZZ(2));
+		}
+
+		t_c = fopen("sws/t_ci.dat", "w");
+		for(int i=0; i<sms.size(); i++){
+			asd += sms[i];
+			if(asd.size()==bl-1){
+				ZZ num(INIT_VAL, asd.c_str());
+				temp = modulo(num*k,pb);
+				load_bq_(t_c, zz_to_str(temp), ZZ(bl));
+				asd = "";
+			}
+		}
+
+		if(asd.size()!=bl-1){
+			while(asd.size()!=bl-1) asd+="0";
+			ZZ num(INIT_VAL, asd.c_str());
+			temp = modulo(num*k,pb);
+			load_bq_(t_c, zz_to_str(temp), ZZ(bl));
+		}
+		fclose(t_c);
+	}
+
+	void descifrar(FILE *t_ci, ZZ c){
+		char aux;
+		string num = "", te = "", aux1, wq = "", ms="";
+		ZZ rt, w = euc_ext(exp_mod(c,this->d,this->p),p);
+		int n;
+		bool t = true;
+		while((aux=getc(t_ci))!=EOF){
+			num += aux;
+			if(num.size() == this->mb){
+				ZZ temp(INIT_VAL, num.c_str());
+				rt = modulo(w*temp, this->p);
+				aux1 = zz_to_str(rt);
+				te += con_zero(aux1, (ZZ)this->mb-1);
+				num = "";
+			}
+		}
+
+		t_dc = fopen("sws/t_dc.dat", "w");
+		for(int i=0; i<te.size(); i++){
+			wq+=te[i];
+			if(wq.size()==2){
+				int b = atoi(wq.c_str());
+				ms += alfa[b];
+				wq = "";
+			}
+		}
+		load_bq(t_dc,ms);
+		fclose(t_dc);
+	}
+
 	~gammal_(){	};
 };
 
@@ -213,21 +308,23 @@ public:
 
 int main(int argc, char const *argv[]){
 	encrypted *cont = new encrypted();
-	rsa *rs = new rsa(10);
-	gammal_ *gam  = new gammal_();
 	bool t = true;
-	int d;
+	int d, r=100;
 	while(t){
 		d = menu();
 		switch(d){
 			case 1:{
+				gammal_ *gam  = new gammal_(r);
 				cont->set_strategy(gam);
 				cont->do_it();
+				delete gam;
 				break;
 			}
 			case 2:{
+				rsa *rs = new rsa(r);
 				cont->set_strategy(rs);
 				cont->do_it();
+				delete rs;
 				break;
 			}
 			case 3:
@@ -235,5 +332,6 @@ int main(int argc, char const *argv[]){
 				break;
 		}
 	}
+	delete cont;
 	return 0;
 }
