@@ -40,10 +40,10 @@ public:
 					this->inf();
 					break;
 				case 2:
-					enc();
+					this->enc();
 					break;
 				case 3:
-					dec();
+					this->dec();
 					break;
 				case 4:
 					t = false;
