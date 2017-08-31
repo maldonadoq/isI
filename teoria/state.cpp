@@ -97,7 +97,7 @@ int main(int argc, char const *argv[]){
 	yellow_light *yellow = new yellow_light(2000);
 	
 	int asd[4] = {1,2,3,4};
-	int n = 10;
+	int n = 20;
 	int opcion;
 	menu();
 	int i = 0;
