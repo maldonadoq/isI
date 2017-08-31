@@ -21,6 +21,7 @@ static string alfa = "0123456789,abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRST
 
 class strategy{
 public:
+	FILE *t_c, *t_dc;
 	strategy(){	};
 	virtual void inf() = 0;
 	virtual void enc() = 0;
@@ -59,11 +60,9 @@ public:
 class rsa: public strategy{
 private:
 	ZZ p, q ,c_pr;
-	FILE *t_c, *t_dc;
 	vector<ZZ> _p, _q, P, dpq;
 public:
 	vector<ZZ> criba;
-	double time;
 	ZZ c_pu, N;
 	rsa(long int t){
 		this->p = RandomPrime_ZZ(t);
@@ -188,11 +187,10 @@ public:
 };
 
 class gammal_ : public strategy{
-public:
+private:
 	int mb, na;
-	FILE *t_c, *t_dc;
 	ZZ e, p, g, d, r;
-	string abc;
+public:
 	gammal_(int t){
 		this->p = RandomPrime_ZZ(t);
 		this->g = generador(this->p);
