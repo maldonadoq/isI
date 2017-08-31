@@ -1,35 +1,71 @@
+#include <opencv2/core/core.hpp>
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
 #include "src/time.h"
 
+using namespace cv;
 using namespace std;
 
 class state{
 public:
+	Mat src;
+	int x, y, r, t, R, G, B;
+	string name;
 	virtual void ejecuta_accion() = 0;
+	state(){
+		this->src = Mat(400, 400, CV_8UC3, Scalar(0));
+		this->x = this->y = 200;
+		this->r = 150;
+	}
+	void on(){
+		circle(src, Point(this->x,this->y),this->r, Scalar(R,G,B),CV_FILLED, 8,0);
+		imshow(this->name, src);
+		waitKey(this->t);
+	}
+	void off(){
+		this->src = Mat(400, 400, CV_8UC3, Scalar(0));
+		imshow(this->name, src);
+	}
 	virtual ~state(){	};
 };
 
 class red_light : public state{
 public:
+	red_light(int _t){	
+		this->name = "Traffic Light [RED]";
+		this->t = _t;
+		this->R = 0;	this->G = 0;	this->B = 255;
+	}
 	void ejecuta_accion(){
-		cout << "traffic_light: RED                   time: 5s" << endl;
-		wait(5);
+		cout << this->name << ":                   time: 4s" << endl;
+		on();	off();
 	}
 };
 
 class green_light : public state{
 public:
+	green_light(int _t){	
+		this->name = "Traffic Light [GREEN]";
+		this->t = _t;
+		this->R = 43;	this->G = 154;	this->B = 15;
+	}
 	void ejecuta_accion(){
-		cout << "traffic_light: GREEN                 time: 5s" << endl;
-		wait(5);
+		cout << this->name << ":                 time: 5s" << endl;
+		on();	off();
 	}
 };
 
 class yellow_light : public state{
 public:
+	yellow_light(int _t){	
+		this->name = "Traffic Light [YELLOW]";
+		this->t = _t;
+		this->R = 0;	this->G = 255;	this->B = 255;
+	}
 	void ejecuta_accion(){
-		cout << "traffic_light: YELLOW                time: 2s" << endl;
-		wait(2);
+		cout << this->name << ":                time: 2s" << endl;
+		on();	off();
 	}
 };
 
@@ -56,9 +92,9 @@ traffic_light *traffic_light::unico4 = NULL;
 
 int main(int argc, char const *argv[]){
 	traffic_light *traffic = traffic_light::get_instance();
-	red_light *red = new red_light();
-	green_light *green = new green_light();
-	yellow_light *yellow = new yellow_light();
+	red_light *red = new red_light(4000);
+	green_light *green = new green_light(5000);
+	yellow_light *yellow = new yellow_light(2000);
 	
 	int asd[4] = {1,2,3,4};
 	int n = 10;
