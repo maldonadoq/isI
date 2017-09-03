@@ -92,6 +92,7 @@ traffic_light *traffic_light::unico4 = NULL;
 
 int main(int argc, char const *argv[]){
 	traffic_light *traffic = traffic_light::get_instance();
+	
 	red_light *red = new red_light(4000);
 	green_light *green = new green_light(5000);
 	yellow_light *yellow = new yellow_light(2000);
