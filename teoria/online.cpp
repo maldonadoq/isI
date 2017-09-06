@@ -88,6 +88,7 @@ int main(int argc, char const *argv[]){
 
 	a->offline();
 	b->offline();
+	c->offline();
 
 	cout << "╔════════════════════════════╗" << endl;
 	cout << "╚════════════════════════════╝" << endl << endl;
