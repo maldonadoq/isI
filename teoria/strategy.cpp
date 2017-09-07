@@ -104,84 +104,9 @@ public:
 		fclose(t_c);
 	}
 
-	void cifrar(FILE *t_pl, ZZ c_pu, ZZ N){
-		ZZ t_cif, c1 = ZZ(0);
-		string tb = to_string(alfa.size());
-		int bq1 = tb.size(), p, c;
-		ZZ bq3 = ZZ(zz_to_str(N).size());
-
-		string sms = "", temp, aux, str;
-		bool tr = true;
-
-		t_c = fopen("sws/t_ci.dat", "w");
-		while(tr){
-			c=getc(t_pl);
-			if(c!=EOF){
-				p = alfa.find(c);
-				aux = to_string(p);
-				if(aux.size() != bq1) aux = con_zero(aux, ZZ(bq1));
-			}
-			temp = sms;
-			sms += aux;
-			ZZ num(INIT_VAL, sms.c_str());
-			if(c==EOF){
-				ZZ num_(INIT_VAL, temp.c_str());
-				str = zz_to_str(exp_mod(num_, c_pu, N));
-				load_bq_(t_c, str, bq3);
-				tr = false;
-			}
-			else if(num>N){
-				ZZ nu(INIT_VAL, temp.c_str());
-				str = zz_to_str(exp_mod(nu, c_pu, N));
-				load_bq_(t_c, str, bq3);
-				sms = aux;
-			}
-		}
-		fclose(t_c);
-	}
-
-	void descifrar(FILE *t_c){
-		ZZ bq1 = ZZ((zz_to_str(ZZ(alfa.size()))).size());
-		ZZ bq3 = ZZ(zz_to_str(this->N).size());
-		ZZ temp = ZZ(0);
-
-		char c;
-		string num = "", sms = "", str;
-		while((c=getc(t_c))!=EOF){
-			temp++;
-			num += c;
-			if(temp == bq3){
-				ZZ aux(INIT_VAL, num.c_str());
-				str = zz_to_str(resto_chino_rsa(aux));
-				sms += str;
-				num = "";
-				temp = ZZ(0);
-			}
-		}
-
-		t_dc = fopen("sws/t_dc.dat", "w");
-		string ind = "";
-		for(unsigned i=0; sms[i]!='\0'; i++){
-			ind += sms[i];
-			if(ind.size() == bq1){
-				int b = atoi(ind.c_str());
-				fprintf(t_dc,"%c",alfa[b]);
-				ind = "";
-			}
-		}
-		fclose(t_dc);
-	}
-
-	ZZ resto_chino_rsa(ZZ w){
-		ZZ x = ZZ(0), a, ad;
-		for(long int j=0;j<_p.size();j++){
-			ad = modulo(w, _p[j]); //saca modulo de t_cifr con p o q respe
-			a = exp_mod(ad, dpq[j],_p[j]); //saca el a , para cada uno
-			x+= a*P[j]*_q[j];
-		}
-		x = modulo(x, N);
-		return x;
-	}
+	void cifrar(FILE *t_pl, ZZ c_pu, ZZ N);
+	void descifrar(FILE *t_c);
+	ZZ resto_chino_rsa(ZZ w);
 
 	virtual ~rsa(){	};
 };
@@ -222,73 +147,8 @@ public:
 		fclose(t_c);
 	}
 	
-	void cifrar(FILE *t_pl, ZZ pb, ZZ gb, ZZ eb){
-		int bl = zz_to_str(pb).size(), po;
-		ZZ ra = modulo(RandomPrime_ZZ(bl), pb-4)+2;
-		ZZ c1 = exp_mod(gb, ra, pb);
-		cout << endl << "c1:   " << c1 << endl;
-		ZZ k = exp_mod(eb, ra, pb);
-		
-		char c;
-		string asd="", sms="", aux;
-		ZZ temp;
-
-		while((c=getc(t_pl))!=EOF){
-			po = alfa.find(c);
-			aux = to_string(po);
-			sms += con_zero(aux,ZZ(2));
-		}
-
-		t_c = fopen("sws/t_ci.dat", "w");
-		for(int i=0; i<sms.size(); i++){
-			asd += sms[i];
-			if(asd.size()==bl-1){
-				ZZ num(INIT_VAL, asd.c_str());
-				temp = modulo(num*k,pb);
-				load_bq_(t_c, zz_to_str(temp), ZZ(bl));
-				asd = "";
-			}
-		}
-
-		if(asd.size()!=bl-1){
-			while(asd.size()!=bl-1) asd+="0";
-			ZZ num(INIT_VAL, asd.c_str());
-			temp = modulo(num*k,pb);
-			load_bq_(t_c, zz_to_str(temp), ZZ(bl));
-		}
-		fclose(t_c);
-	}
-
-	void descifrar(FILE *t_ci, ZZ c){
-		char aux;
-		string num = "", te = "", aux1, wq = "", ms="";
-		ZZ rt, w = euc_ext(exp_mod(c,this->d,this->p),p);
-		int n;
-		bool t = true;
-		while((aux=getc(t_ci))!=EOF){
-			num += aux;
-			if(num.size() == this->mb){
-				ZZ temp(INIT_VAL, num.c_str());
-				rt = modulo(w*temp, this->p);
-				aux1 = zz_to_str(rt);
-				te += con_zero(aux1, (ZZ)this->mb-1);
-				num = "";
-			}
-		}
-
-		t_dc = fopen("sws/t_dc.dat", "w");
-		for(int i=0; i<te.size(); i++){
-			wq+=te[i];
-			if(wq.size()==2){
-				int b = atoi(wq.c_str());
-				ms += alfa[b];
-				wq = "";
-			}
-		}
-		load_bq(t_dc,ms);
-		fclose(t_dc);
-	}
-
+	void cifrar(FILE *t_pl, ZZ pb, ZZ gb, ZZ eb);
+	void descifrar(FILE *t_ci, ZZ c);
 	~gammal_(){	};
 };
 
@@ -308,23 +168,19 @@ int main(int argc, char const *argv[]){
 	encrypted *cont = new encrypted();
 	bool t = true;
 	int d, r=100;
+	gammal_ *gam  = new gammal_(r);
+	rsa *rs = new rsa(r);
 	while(t){
 		d = menu();
 		switch(d){
-			case 1:{
-				gammal_ *gam  = new gammal_(r);
+			case 1:
 				cont->set_strategy(gam);
 				cont->do_it();
-				delete gam;
 				break;
-			}
-			case 2:{
-				rsa *rs = new rsa(r);
+			case 2:
 				cont->set_strategy(rs);
 				cont->do_it();
-				delete rs;
 				break;
-			}
 			case 3:
 				t = false;
 				break;
