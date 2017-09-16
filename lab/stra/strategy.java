@@ -92,22 +92,17 @@ public class strategy{
 		CO.set("#",new mcd());
 		CO.set("%",new fn());
 
-		String da = JOptionPane.showInputDialog("numero: ");
-		String op = JOptionPane.showInputDialog("operator: ");
-		String db = JOptionPane.showInputDialog("numero: ");
+		String da, op, db;
+		int a,b;
 		
-		int a = Integer.parseInt(da);
-		int b = Integer.parseInt(db);
-		System.out.printf("%d%s%d: %d\n",a,op,b,CO.execute(op,a,b));
-
-		/*while(true){
-			String da = JOptionPane.showInputDialog("numero: ");
-			String op = JOptionPane.showInputDialog("operator: ");
-			String db = JOptionPane.showInputDialog("numero: ");
+		while(true){
+			da = JOptionPane.showInputDialog("numero: ");
+			op = JOptionPane.showInputDialog("operator: ");
+			db = JOptionPane.showInputDialog("numero: ");
 			
-			int a = Integer.parseInt(da);
-			int b = Integer.parseInt(db);
+			a = Integer.parseInt(da);
+			b = Integer.parseInt(db);
 			System.out.println(CO.execute(op,a,b));
-		}*/
+		}
 	}
 }
