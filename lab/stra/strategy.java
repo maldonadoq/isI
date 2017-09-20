@@ -82,8 +82,7 @@ class ope{
 }
 
 public class strategy{
-	public static void main(String[] args){	
-		Scanner sc = new Scanner(System.in);
+	public static void main(String[] args){	2
 		ope CO = new ope();
 		CO.set("+",new suma());
 		CO.set("-",new resta());
@@ -102,7 +101,7 @@ public class strategy{
 			
 			a = Integer.parseInt(da);
 			b = Integer.parseInt(db);
-			System.out.println(CO.execute(op,a,b));
+			System.out.printf("%d%s%d: %d",a,op,b,CO.execute(op,a,b));
 		}
 	}
 }

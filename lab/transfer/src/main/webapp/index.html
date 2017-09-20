@@ -1,0 +1,57 @@
+<html>
+<head>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="lib.js"></script>
+</head>
+<body>
+
+<div id="menuPrincipal">
+	<a href="#cuentas" onclick="mostrarCuentas();">Cuentas</a>
+	<br />
+	<a href="">Transferencias</a>
+</div>
+
+<div style="display: none;" id="listadoCuentas">
+<h2  >Listado de Cuentas</h2>
+<ul   id="cuentas"></ul>
+<a href="javascript: mostrarMenuPrincipal();">Menu Principal</a>
+</div>
+
+<div style="display: none;" id="modificarCuenta">
+	<table>
+		<tr>
+			<td>Numero:</td>
+			<td><input id="numero" /> </td>
+		</tr>
+		<tr>
+			<td>Saldo:</td>
+			<td><input id="saldo" /> </td>
+		</tr>
+	</table>
+</div>
+
+<h2  style="display: none;">Transferencia</h2>
+
+<table style="display: none;">
+	<tbody>
+	<tr>
+		<td>Origen:</td>
+		<td><input id="origen" /></td>
+	</tr>
+	<tr>
+		<td>Destino:</td>
+		<td><input id="destino" /></td>
+	</tr>
+	<tr>
+		<td>Monto:</td>
+		<td><input id="monto" /></td>
+	</tr>
+	<tr>
+		<td><button onclick="transferir()">Transferir</button></td>
+		<td></td>
+	</tr>
+	</tbody>
+</table>
+
+</body>
+</html>
